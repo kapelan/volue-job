@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Volue.Job.DbMigrator": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

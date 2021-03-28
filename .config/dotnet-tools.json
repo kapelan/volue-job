@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "databasepreparationtools.import.console": {
+      "version": "2.1.7",
+      "commands": [
+        "fixtures"
+      ]
+    }
+  }
+}

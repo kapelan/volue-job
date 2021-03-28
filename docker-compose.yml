@@ -1,0 +1,92 @@
+version: "3.9"
+
+networks:
+  default:
+    external:
+      name: local_volue
+
+services:
+
+  # This "container" is a workaround to pre-create db
+  dbmigrator:
+    container_name: dbmigrator
+    hostname: dbmigrator
+    build: 
+      context: ./
+      dockerfile: ./src/Volue.Job.DbMigrator/Dockerfile
+    networks:
+      - default
+
+ # This "container" is a workaround to pre-create db users
+  sql-server-setup:
+    image: mcr.microsoft.com/mssql-tools
+    hostname: sql-server-setup
+    container_name: sql-server-setup
+    links:
+      - dbmigrator
+    depends_on:
+      - dbmigrator
+    volumes:
+      - ./docker:/tmp/docker
+    networks:
+      - default
+    command: bash -c 'sed -i "s/\r$$//g" /tmp/docker/scripts/bash/add-users.sh &&
+             sed -i "s/\r$$//g" /tmp/docker/scripts/bash/wait.sh &&
+             bash /tmp/docker/scripts/bash/add-users.sh dbmigrator'
+
+  web-api:
+    container_name: web-api
+    restart: always
+    image: web-api
+    build: 
+        context: ./
+        dockerfile: ./src/Volue.Job.WebApi/Dockerfile
+        args:
+          BEFORE_SHELL: 'sed -i "s/\r$$//g" /tmp/docker/scripts/wait.sh &&
+                         sh /tmp/docker/scripts/wait.sh sql-server-setup'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDev
+      - ASPNETCORE_URLS=https://+:50000;http://+:5000
+      - ASPNETCORE_HTTPS_PORT=50000
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=devpassword
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    depends_on: 
+      - sql-server-setup
+      - calculation-service
+    links:
+      - sql-server-setup
+      - calculation-service 
+    networks:
+      default:
+        ipv4_address: 10.6.0.22
+    ports:
+      - "5000:5000"
+      - "50000:50000"
+      - "9001:9001"
+    volumes:
+      - ~/.aspnet/https:/https:ro
+      - ./docker/scripts:/tmp/docker/scripts
+
+  calculation-service:
+    container_name: calculation-service
+    build: 
+      context: ./
+      dockerfile: ./src/Volue.Job.CalculationService/Dockerfile
+      args:
+        BEFORE_SHELL: 'sed -i "s/\r$$//g" /tmp/docker/scripts/wait.sh &&
+                       sh /tmp/docker/scripts/wait.sh sql-server-setup'
+    restart: always
+    depends_on: 
+      - sql-server-setup
+    links:
+      - sql-server-setup
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./docker/scripts:/tmp/docker/scripts
+    networks:
+      default:
+        ipv4_address: 10.6.0.24
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDev
+      - ASPNETCORE_URLS=http://0.0.0.0:5000

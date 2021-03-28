@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<akka>
+  <![CDATA[
+       akka {
+            loggers = ["Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog"]
+                    actor {
+                            provider = remote                  
+                        }
+                        remote {
+                            dot-netty.tcp {
+                                port = 9001
+                                hostname = localhost
+                                bind-port = 9001
+                                bind-hostname = localhost
+                            }
+                        }
+                    }
+      ]]>
+</akka>

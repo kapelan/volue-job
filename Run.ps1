@@ -1,0 +1,1 @@
+invoke-expression 'docker-compose up -d --build'

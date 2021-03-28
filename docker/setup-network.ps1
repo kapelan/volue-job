@@ -1,0 +1,1 @@
+﻿docker network create --subnet 10.6.0.0/24 local_volue

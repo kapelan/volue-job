@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Volue.Job.CalculationService": {
+      "commandName": "Project"
+    },
+    "Docker (1)": {
+      "commandName": "Docker"
+    }
+  }
+}
