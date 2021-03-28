@@ -12,7 +12,7 @@
 * Run .docker/setup-infrastructure.ps1 script
 * Run Run.ps1 script
 
-### How do I get set up? ###
+### Architecture ###
 
 To provide scalibility I used akka.net framework in calculation service.
 
@@ -28,6 +28,6 @@ https://petabridge.com/blog/akkadotnet-goes-to-wall-street/
 I put some effort to dockerize everything. There should not be problem to run project.
 
 PS. I would not say it is production ready. I've spent ~6h on this project, but working with akka is more consumig than standard approaches. 
-Besides I was focused on deliverind POC that shows how it should be done. 
+Besides I was focused on deliverind POC that shows how it should be done in my opinion. 
 So there are places that requires refactorization. Those places are marked with comment TODO. 
 
